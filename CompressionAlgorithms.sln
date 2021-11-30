@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31606.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompressionAlgorithms", "CompressionAlgorithms\CompressionAlgorithms.csproj", "{80C3D751-358C-4E5F-8DF4-6E3032D0D260}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms", "Fano\Algorithms.csproj", "{F0852616-936B-4D4A-847E-D5BCD7EDC973}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{80C3D751-358C-4E5F-8DF4-6E3032D0D260}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80C3D751-358C-4E5F-8DF4-6E3032D0D260}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80C3D751-358C-4E5F-8DF4-6E3032D0D260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0852616-936B-4D4A-847E-D5BCD7EDC973}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0852616-936B-4D4A-847E-D5BCD7EDC973}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0852616-936B-4D4A-847E-D5BCD7EDC973}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0852616-936B-4D4A-847E-D5BCD7EDC973}.Release|Any CPU.Build.0 = Release|Any CPU
+		{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

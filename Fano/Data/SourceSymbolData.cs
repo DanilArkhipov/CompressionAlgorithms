@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fano.Data
+namespace Algorithms.Data
 {
     /// <summary>
     /// Данные о символах в исходном тексте

@@ -42,13 +42,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Comparers\BitArrayComparer.cs" />
-    <Compile Include="Data\FanoEncodedData.cs" />
+    <Compile Include="Data\EncodedData.cs" />
     <Compile Include="Data\FanoMetaData.cs" />
     <Compile Include="Data\SourceSymbolData.cs" />
     <Compile Include="Data\SymbolCode.cs" />
     <Compile Include="FanoCompressor.cs" />
     <Compile Include="FanoDataPreparer.cs" />
-    <Compile Include="ICompressor.cs" />
+    <Compile Include="Hamming.cs" />
+    <Compile Include="ICoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

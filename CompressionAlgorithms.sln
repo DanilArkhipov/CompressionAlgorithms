@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms", "Fano\Algorith
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{1AD07962-C310-4715-89E5-C96323D7FBFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{061AC7A1-EFE7-4C8D-B73E-2A338217A7E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AD07962-C310-4715-89E5-C96323D7FBFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AD07962-C310-4715-89E5-C96323D7FBFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AD07962-C310-4715-89E5-C96323D7FBFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AD07962-C310-4715-89E5-C96323D7FBFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

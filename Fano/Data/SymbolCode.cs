@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fano.Data
+namespace Algorithms.Data
 {
     /// <summary>
     /// Класс содержащий данные о символе исходного алфавита и его коде

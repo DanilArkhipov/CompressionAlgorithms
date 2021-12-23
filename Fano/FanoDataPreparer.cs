@@ -1,4 +1,4 @@
-﻿using Fano.Data;
+﻿using Algorithms.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fano
+namespace Algorithms
 {
     /// <summary>
     /// Класс отвечающий за подготовку данных для работы алгоритма Фано

@@ -1,15 +1,16 @@
-﻿using Fano.Data;
+﻿using Algorithms.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Fano.Comparers;
+using Algorithms.Comparers;
 
-namespace Fano
+
+namespace Algorithms
 {
-    public class FanoCompressor : ICompressor
+    public class FanoCompressor 
     {
         public FanoDataPreparer DataPreparer { get; set; }
 
@@ -17,11 +18,11 @@ namespace Fano
         {
             DataPreparer = new FanoDataPreparer();
         }
-        public string Decode(FanoEncodedData data)
+        public string Decode(EncodedData data)
         {
             var res = new StringBuilder();
-            var codes = new Dictionary<BitArray,char>(data.MetaDada.Codes.Length,new BitArrayComparer());
-            foreach(var c in data.MetaDada.Codes)
+            var codes = new Dictionary<BitArray, char>(data.MetaDada.Codes.Length, new BitArrayComparer());
+            foreach (var c in data.MetaDada.Codes)
             {
                 codes.Add(c.Code, c.Symbol);
             }
@@ -31,7 +32,7 @@ namespace Fano
             for (int i = 0; i < data.Data.Length; i++)
             {
                 code[localCodePos] = data.Data[i];
-                if (codes.TryGetValue(code,out value))
+                if (codes.TryGetValue(code, out value))
                 {
                     res.Append(value);
                     code = new BitArray(1);
@@ -46,7 +47,7 @@ namespace Fano
             return res.ToString();
         }
 
-        public async Task<FanoEncodedData> Encode(IEnumerable<string> text)
+        public async Task<EncodedData> Encode(IEnumerable<string> text)
         {
             var sourceSymbolsData = await DataPreparer.PrepareDataAsync(text);
             var codes = CreateCodes(sourceSymbolsData);
@@ -60,12 +61,12 @@ namespace Fano
 
             int currPos = 0;
             BitArray bits;
-            foreach(var line in text)
+            foreach (var line in text)
             {
-                for(int i = 0; i < line.Length; i++)
+                for (int i = 0; i < line.Length; i++)
                 {
                     bits = codes[line[i]];
-                    for(int j = 0; j < bits.Count; j++)
+                    for (int j = 0; j < bits.Count; j++)
                     {
                         encodedText[currPos] = bits[j];
                         currPos++;
@@ -74,7 +75,7 @@ namespace Fano
             }
             var symbolCodes = codes.Select(x => new SymbolCode() { Symbol = x.Key, Code = x.Value }).ToArray();
             var metaData = new FanoMetaData(symbolCodes);
-            return new FanoEncodedData(metaData,encodedText);
+            return new EncodedData(metaData, encodedText);
         }
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace Fano
             var sortedData = preparedData
                 .OrderByDescending(x => x.Frequency)
                 .ToArray();
-            CreateFanoCodeTree(codes,sortedData,0,sortedData.Length,new BitArray(0));
+            CreateFanoCodeTree(codes, sortedData, 0, sortedData.Length, new BitArray(0));
             return codes;
         }
 
@@ -138,7 +139,7 @@ namespace Fano
         {
             var leftQuantity = 0;
             var rightQuantity = 0;
-            var difference = Int32.MaxValue;
+            var difference = int.MaxValue;
             var newDifference = 0;
             for (int i = startIndex; i < endIndex; i++)
             {
@@ -171,8 +172,8 @@ namespace Fano
         /// </summary>
         private BitArray AddCodeValue(BitArray currentCode, bool newValue)
         {
-            var newCode = new BitArray(currentCode.Length+1);
-            for(int i =0; i < currentCode.Length; i++)
+            var newCode = new BitArray(currentCode.Length + 1);
+            for (int i = 0; i < currentCode.Length; i++)
             {
                 newCode[i] = currentCode[i];
             }

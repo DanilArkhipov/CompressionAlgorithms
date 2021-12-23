@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fano.Comparers
+namespace Algorithms.Comparers
 {
     public class BitArrayComparer : EqualityComparer<BitArray>
     {

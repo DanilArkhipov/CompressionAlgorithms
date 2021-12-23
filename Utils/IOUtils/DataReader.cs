@@ -1,4 +1,4 @@
-﻿using Fano.Data;
+﻿using Algorithms.Data;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -20,7 +20,7 @@ namespace Fano
         /// <summary>
         /// Метод записывает закодированные данные в файл
         /// </summary>
-        public void WriteEncodedData(string path, FanoEncodedData data)
+        public void WriteEncodedData(string path, EncodedData data)
         {
             BinaryFormatter formatter = new BinaryFormatter();
             // получаем поток, куда будем записывать сериализованный объект
@@ -33,12 +33,12 @@ namespace Fano
         /// <summary>
         /// Меод считывает закодированные данные
         /// </summary>
-        public FanoEncodedData ReadEncodedData(string path)
+        public EncodedData ReadEncodedData(string path)
         {
             BinaryFormatter formatter = new BinaryFormatter();
             using (FileStream fs = new FileStream(path, FileMode.Open))
             {
-                FanoEncodedData data = (FanoEncodedData)formatter.Deserialize(fs);
+                EncodedData data = (EncodedData)formatter.Deserialize(fs);
                 return data;
             }
         }

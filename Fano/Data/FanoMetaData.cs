@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fano.Data
+namespace Algorithms.Data
 {
     [Serializable]
     public class FanoMetaData

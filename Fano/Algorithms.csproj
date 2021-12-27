@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,7 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArithmeticAlgorithm.cs" />
+    <Compile Include="ArithmeticEncoder.cs" />
     <Compile Include="Comparers\BitArrayComparer.cs" />
+    <Compile Include="Data\ArithmeticData.cs" />
     <Compile Include="Data\EncodedData.cs" />
     <Compile Include="Data\FanoMetaData.cs" />
     <Compile Include="Data\SourceSymbolData.cs" />
@@ -51,6 +55,9 @@
     <Compile Include="Hamming.cs" />
     <Compile Include="ICoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

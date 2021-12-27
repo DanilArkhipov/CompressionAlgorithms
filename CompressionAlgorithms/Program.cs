@@ -37,16 +37,22 @@ namespace CompressionAlgorithms
             //{
             //    Console.WriteLine("Первым параметром нужно передать 0, если данные кодируются, и 1, если данные нужно раскодировать");
             //}
-            var dataReader = new DataReader();
-            var data = dataReader.ReadDataChunk("C:\\Users\\strel\\Desktop\\test.txt");
-            var fanoCompressor = new FanoCompressor();
-            var encodedData = await fanoCompressor.Encode(data);
-            dataReader.WriteEncodedData("C:\\Users\\strel\\Desktop\\testRes.txt", encodedData);
+            //var dataReader = new DataReader();
+            //var data = dataReader.ReadDataChunk("C:\\Users\\strel\\Desktop\\test.txt");
+            //var fanoCompressor = new FanoCompressor();
+            //var encodedData = await fanoCompressor.Encode(data);
+            //dataReader.WriteEncodedData("C:\\Users\\strel\\Desktop\\testRes.txt", encodedData);
 
-            encodedData = dataReader.ReadEncodedData("C:\\Users\\strel\\Desktop\\testRes.txt");
-            var str = fanoCompressor.Decode(encodedData);
-            dataReader.WriteDataToFile("C:\\Users\\strel\\Desktop\\testResult.txt",str);
-            Console.ReadKey();
+            //encodedData = dataReader.ReadEncodedData("C:\\Users\\strel\\Desktop\\testRes.txt");
+            //var str = fanoCompressor.Decode(encodedData);
+            //dataReader.WriteDataToFile("C:\\Users\\strel\\Desktop\\testResult.txt",str);
+            //Console.ReadKey();
+
+            //string z1 = Convert.ToString(unchecked((long)(ulong.MaxValue-1231231112312), 2);
+            var s = "01111";
+            var b = Convert.ToByte(s, fromBase: 2);
+            Console.WriteLine(b);
+            Console.ReadLine();
         }
     }
 }

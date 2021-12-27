@@ -13,11 +13,11 @@ namespace Algorithms
         /// <summary>
         /// Закодировать исходный текст
         /// </summary>
-        Task<EncodedData> Encode(IEnumerable<string> text);
+        Task Encode(String inputPath, String outputPath);
 
         /// <summary>
         /// Дескодировать текст
         /// </summary>
-        string Decode(EncodedData data);
+        Task Decode(String inputPath, String outputPath);
     }
 }

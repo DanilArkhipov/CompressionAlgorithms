@@ -18,6 +18,10 @@ namespace UI.Data.Enums
             {
                 return "Алгоритм Шеннона-Фано";
             }
+            if (englishName == Algorithm.Arithmetic.ToString())
+            {
+                return "Арфиметическое кодирование";
+            }
 
             throw new ArgumentException("Некорректное название алгоритма");
         }

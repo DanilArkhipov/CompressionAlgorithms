@@ -32,14 +32,15 @@ namespace UI
         }
 
         private void BtnAccept_Click(object sender, EventArgs e)
-        {     
+        {
             saveFileDialog.Filter = GetSaveFileFilter();
             saveFileDialog.RestoreDirectory = true;
 
             string data;
             try
             {
-                using (var sr = new StreamReader(labelFilePath.Text)) {
+                using (var sr = new StreamReader(labelFilePath.Text))
+                {
                     data = sr.ReadToEnd();
                 }
             }
@@ -50,26 +51,22 @@ namespace UI
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using (var sw = new StreamWriter(saveFileDialog.FileName))
+                ICoder coder = null;
+                if ((string)comboBoxSelectAlgorithm.SelectedItem == EnumHelper.GetRussianAlgorithmName(Data.Enums.Algorithm.Arithmetic.ToString()))
                 {
-                    if ((string)comboBoxSelectAlgorithm.SelectedItem == EnumHelper.GetRussianAlgorithmName(Data.Enums.Algorithm.Hamming.ToString()))
-                    {
-                        if ((string)comboBoxSelectAction.SelectedItem == EnumHelper.GetRussianActionName(Data.Enums.Action.Encode.ToString()))
-                        {
-                            var encodedData = Hamming.Encode(data);
-                            sw.WriteLine(encodedData);
-                        }
-                        else
-                        {
-                            var decodedData = Hamming.Decode(data);
-                            sw.WriteLine(decodedData);
-                        }
-                    }
-                    
+                    coder = new ArithmeticEncoder();
                 }
 
-                
+                if ((string)comboBoxSelectAction.SelectedItem == EnumHelper.GetRussianActionName(Data.Enums.Action.Encode.ToString()))
+                {
+                    coder.Encode(labelFilePath.Text, saveFileDialog.FileName);
+                }
+                else
+                {
+                    coder.Decode(labelFilePath.Text, saveFileDialog.FileName);
+                }
             }
+
         }
 
         private void BtnChooseFile_Click(object sender, EventArgs e)
@@ -106,7 +103,7 @@ namespace UI
             {
                 comboboxSelectedText = (string)comboBoxSelectAlgorithm.SelectedValue;
 
-                if(comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.Hamming.ToString()))
+                if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.Hamming.ToString()))
                 {
                     return "Hamming encoded files(*.hef)|*.hef";
                 }
@@ -114,6 +111,11 @@ namespace UI
                 if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.ShennonFano.ToString()))
                 {
                     return "Shennon-Fano compressed files(*.sfc)|*.sfc";
+                }
+
+                if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.Arithmetic.ToString()))
+                {
+                    return "Arithmetic compressed files(*.acf)|*.acf";
                 }
 
                 throw new ArgumentException("Выберете алгоритм");
@@ -142,6 +144,11 @@ namespace UI
                 if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.ShennonFano.ToString()))
                 {
                     return "Shennon-Fano compressed files(*.sfc)|*.sfc";
+                }
+
+                if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.Arithmetic.ToString()))
+                {
+                    return "Arithmetic compressed files(*.acf)|*.acf";
                 }
 
                 throw new ArgumentException("Выберете алгоритм");

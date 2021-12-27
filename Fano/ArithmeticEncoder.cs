@@ -19,17 +19,7 @@ namespace Algorithms
 
         public async Task Encode(string inputPath, string outputPath)
         {
-            string text;
-            using (var sr = new StreamReader(inputPath))
-            {
-                text = await sr.ReadToEndAsync();
-            }
-            var data =  ArithmeticAlgorithm.Encode(text);
-
-            using (var bw = new BinaryWriter(File.Open(outputPath, FileMode.Create)))
-            {
-                bw.Write(data);
-            }
+            ArithmeticAlgorithm.Encode(inputPath, outputPath);
         }
     }
 }

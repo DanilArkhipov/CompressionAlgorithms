@@ -52,7 +52,8 @@
     <Compile Include="Data\SymbolCode.cs" />
     <Compile Include="FanoCompressor.cs" />
     <Compile Include="FanoDataPreparer.cs" />
-    <Compile Include="Hamming.cs" />
+    <Compile Include="HammingAlgorithm.cs" />
+    <Compile Include="HammingCoder.cs" />
     <Compile Include="ICoder.cs" />
     <Compile Include="LZWAlgorithm.cs" />
     <Compile Include="LZWCoder.cs" />

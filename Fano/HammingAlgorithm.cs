@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Algorithms
 {
-    public static class Hamming
+    public static class HammingAlgorithm
     {
         //Проверочная матрица
         private readonly static char[][] checkMatrix =

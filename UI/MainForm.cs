@@ -62,6 +62,11 @@ namespace UI
                     coder = new LZWCoder();
                 }
 
+                else if ((string)comboBoxSelectAlgorithm.SelectedItem == EnumHelper.GetRussianAlgorithmName(Data.Enums.Algorithm.Hamming.ToString()))
+                {
+                    coder = new HammingCoder();
+                }
+
                 if ((string)comboBoxSelectAction.SelectedItem == EnumHelper.GetRussianActionName(Data.Enums.Action.Encode.ToString()))
                 {
                     coder.Encode(labelFilePath.Text, saveFileDialog.FileName);

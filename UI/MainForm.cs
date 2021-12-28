@@ -57,6 +57,11 @@ namespace UI
                     coder = new ArithmeticEncoder();
                 }
 
+                else if ((string)comboBoxSelectAlgorithm.SelectedItem == EnumHelper.GetRussianAlgorithmName(Data.Enums.Algorithm.LZW.ToString()))
+                {
+                    coder = new LZWCoder();
+                }
+
                 if ((string)comboBoxSelectAction.SelectedItem == EnumHelper.GetRussianActionName(Data.Enums.Action.Encode.ToString()))
                 {
                     coder.Encode(labelFilePath.Text, saveFileDialog.FileName);
@@ -118,6 +123,11 @@ namespace UI
                     return "Arithmetic compressed files(*.acf)|*.acf";
                 }
 
+                if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.LZW.ToString()))
+                {
+                    return "LZW compressed files(*.lzw)|*.lzw";
+                }
+
                 throw new ArgumentException("Выберете алгоритм");
             }
 
@@ -149,6 +159,11 @@ namespace UI
                 if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.Arithmetic.ToString()))
                 {
                     return "Arithmetic compressed files(*.acf)|*.acf";
+                }
+
+                if (comboboxSelectedText == EnumHelper.GetRussianAlgorithmName(Algorithm.LZW.ToString()))
+                {
+                    return "LZW compressed files(*.lzw)|*.lzw";
                 }
 
                 throw new ArgumentException("Выберете алгоритм");

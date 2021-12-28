@@ -8,6 +8,7 @@ namespace UI.Data.Enums
     {
         ShennonFano,
         Hamming,
-        Arithmetic
+        Arithmetic,
+        LZW,
     }
 }

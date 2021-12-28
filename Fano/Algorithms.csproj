@@ -54,6 +54,8 @@
     <Compile Include="FanoDataPreparer.cs" />
     <Compile Include="Hamming.cs" />
     <Compile Include="ICoder.cs" />
+    <Compile Include="LZWAlgorithm.cs" />
+    <Compile Include="LZWCoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

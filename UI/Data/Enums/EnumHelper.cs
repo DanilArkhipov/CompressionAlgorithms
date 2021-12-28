@@ -22,6 +22,10 @@ namespace UI.Data.Enums
             {
                 return "Арфиметическое кодирование";
             }
+            if(englishName == Algorithm.LZW.ToString())
+            {
+                return "LZW";
+            }
 
             throw new ArgumentException("Некорректное название алгоритма");
         }

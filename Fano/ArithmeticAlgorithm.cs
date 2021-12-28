@@ -11,33 +11,93 @@ namespace Algorithms
 {
     public static class ArithmeticAlgorithm
     {
-        public static string Decode(byte[] data)
+        public static void Decode(string inputPath, string outPath)
         {
-            var bits = BytesToString(data);
-            List<ulong> numerators = new List<ulong>();
-
-            int i = 0;
-            byte countOfBits;
-            while (true)
-            {
-                countOfBits = GetCountOfBits(bits, ref i);
-                if (countOfBits == 1) break;
-                numerators.Add(GetNumerator(bits, ref i, countOfBits));
-                if (bits.Length - i < 6) break;
-            }
-
-            return "adf";
-
+            Dictionary<Char, Symbol> intervals = null;
+            int count = 0;
+            string code = "";
+            ReadData(inputPath, ref intervals, ref count, ref code);
+            SetIntervals(intervals, count);
+            var text = GetText(intervals, count, code);
+            File.WriteAllText(outPath, text);
         }
 
 
 
         #region useless
+        private static string GetText(Dictionary<Char, Symbol> intervals, int count, string code)
+        {
+            var oldIntervals = new Dictionary<Char, Symbol>();
 
-        //private static string ConvertNumeratorToString()
-        //{
+            foreach(var v in intervals.Values)
+            {
+                oldIntervals.Add(v.Value, new Symbol(v.Value,v.Left,v.Right,v.Frequency));
+            }
+            decimal left;
+            decimal right;
+            string leftStr;
+            string rightStr;
+            StringBuilder text = new StringBuilder(count);
+            for(int i = 0; i< count; i++)
+            {
+                foreach(var symbol in intervals.Values)
+                { 
+                    leftStr = symbol.Left.ToString();
+                    rightStr = symbol.Right.ToString().Remove(0,2);
+                    leftStr = leftStr =="0"? new string('0',rightStr.Length):leftStr.Remove(0,2);
+                    left = symbol.Left;
+                    right = symbol.Right;
 
-        //}
+                    if(leftStr.CompareTo(code)<=0 && code.CompareTo(rightStr) < 0)
+                    {
+                        text.Append(symbol.Value);                                      
+
+                        var counOfSame = 0;
+                        for (int j = 0; j < leftStr.Length; j++)
+                        {
+                            if (leftStr[j] == rightStr[j]) counOfSame++;
+                            else break;
+                        }
+
+                        if (counOfSame > 0)
+                        {                           
+                            code = code.Remove(0, counOfSame);
+
+                            left = Decimal.Parse("0,"+leftStr.Remove(0, counOfSame));
+                            right = Decimal.Parse("0,"+rightStr.Remove(0, counOfSame));
+                        }
+
+                        foreach (var v in intervals.Values)
+                        {
+                            v.Left = Decimal.Add(left, Decimal.Multiply(Decimal.Subtract(right, left), oldIntervals[v.Value].Left));
+                            v.Right = Decimal.Add(left, Decimal.Multiply(Decimal.Subtract(right, left), oldIntervals[v.Value].Right));
+                        }
+
+                        if (counOfSame > 0)
+                        {
+                            foreach (var v in intervals.Values)
+                            {
+                                left = Decimal.Parse("0," + leftStr.Remove(0, counOfSame));
+                                right = Decimal.Parse("0," + rightStr.Remove(0, counOfSame));
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            return text.ToString();
+        }
+
+        private static void  SetIntervals(Dictionary<Char,Symbol> intervals, int count)
+        {
+            Decimal prev = 0.0000M;
+            foreach(var v in intervals.Values)
+            {
+                v.Left = prev;
+                prev = Decimal.Add(prev, Decimal.Divide(v.Frequency, count));
+                v.Right = prev;
+            }
+        }
 
         private static ulong GetNumerator(string bits, ref int currentPos, byte countOfBits)
         {
@@ -85,23 +145,120 @@ namespace Algorithms
         {
             var text = File.ReadAllText(inputPath);
             var intervals = GetIntervals(text);
-            var rational = GetRational(text, intervals);
-            using (var bw = new BinaryWriter(File.Open(outputPath,FileMode.Create)))
+            var code = GetCode(text, intervals);
+            WriteData(outputPath,intervals,code);
+        }
+
+        private static void WriteData(string outputPath,Dictionary<Char,Symbol> symbols,string code)
+        {
+            var symbolsValues = symbols.Values.ToArray();
+            using (var bw = new BinaryWriter(File.Open(outputPath, FileMode.Create)))
             {
-                var values = intervals.Values.ToArray();
-                bw.Write((byte)values.Length);
-                for(int i = 0; i < values.Length; i++)
+                bw.Write((byte)symbolsValues.Length);
+
+                foreach(var symbol in symbolsValues)
                 {
-                    bw.Write(values[i].Value);
-                    bw.Write((short)values[i].Frequency);
+                    bw.Write(symbol.Value);
+                    bw.Write((ushort)symbol.Frequency);
                 }
-                var numeratorBytes = rational.Top.ToByteArray();
-                bw.Write((short)numeratorBytes.Length);
-                bw.Write(numeratorBytes);
-                var denumeratorBytes = rational.Bottom.ToByteArray();
-                bw.Write((short)denumeratorBytes.Length);
-                bw.Write(denumeratorBytes);
+
+                var countOfZeroes = 0;
+
+                for(int i = 0; i < code.Length; i++)
+                {
+                    if (code[i] == '0') countOfZeroes++;
+                    else break;
+                }
+
+                var bigInt = BigInteger.Parse(code);
+                var bytes = bigInt.ToByteArray();
+                bw.Write((ushort)countOfZeroes);
+                bw.Write((ushort)bytes.Length);
+                bw.Write(bytes);
             }
+        }
+
+        private static void ReadData(string inputPath, ref Dictionary<Char, Symbol> symbols,ref int count, ref string code)
+        {
+            Char symbol;
+            ushort frequency;
+            ushort countOfZeroes;
+            ushort countOfBytes;
+            byte[] bytes;
+            symbols = new Dictionary<char, Symbol>();
+            count = 0;
+            using (var br = new BinaryReader(File.Open(inputPath, FileMode.Open)))
+            {
+                var countOfSymbols = br.ReadByte();
+
+                for(int i = 0; i<countOfSymbols;i++)
+                {
+                    symbol = br.ReadChar();
+                    frequency = br.ReadUInt16();
+                    count += frequency;
+                    symbols.Add(symbol,new Symbol(symbol,frequency));
+                }
+
+                countOfZeroes = br.ReadUInt16(); 
+                countOfBytes = br.ReadUInt16();
+                bytes = br.ReadBytes(countOfBytes);
+            }
+            var bigInt = new BigInteger(bytes);
+            code = new string('0', countOfZeroes) + bigInt.ToString();
+            
+        }
+
+        private static string GetBestInInterval(string left, string right)
+        {
+            return right.Substring(0, 3);
+        }
+        private static string GetCode(string text, Dictionary<Char,Symbol> intervals)
+        {
+            var sb = new StringBuilder();
+            decimal oldLeft = 0;
+            decimal oldRight = 1;
+            decimal newLeft = 0;
+            decimal newRight = 0;
+            string left = "";
+            string right = "";
+            int countOfSame;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                countOfSame = 0;
+                newLeft = Decimal.Add(oldLeft, Decimal.Multiply(Decimal.Subtract(oldRight, oldLeft), intervals[text[i]].Left));
+                newRight = Decimal.Add(oldLeft, Decimal.Multiply(Decimal.Subtract(oldRight, oldLeft), intervals[text[i]].Right));
+
+                left = Convert.ToString(newLeft);
+                right = Convert.ToString(newRight);
+                left = left != "0" ? left.Remove(0, 2) : new string('0', right.Length);
+                right = right.Remove(0, 2);
+
+                for (int j = 0; j < left.Length; j++)
+                {
+                    if (left[j] == right[j])
+                    {
+                        countOfSame++;
+                    }
+                    else break;
+                }
+
+                for (int j = 0; j < countOfSame; j++)
+                {
+                    sb.Append(left[j]);
+                }
+
+                left = "0," + left.Remove(0,countOfSame);
+                right = "0," + right.Remove(0, countOfSame);
+
+
+                oldLeft = Decimal.Parse(left);
+                oldRight = Decimal.Parse(right);
+            }
+
+            var best = GetBestInInterval(left, right).Remove(0, 2);
+            sb.Append(best);
+            return sb.ToString();
         }
         private static byte[] TransformNumeratorsToBinaryCode(ulong[] numerators)
         {
@@ -205,40 +362,40 @@ namespace Algorithms
 
         //    return strings;
         //}
-        private static Rational GetRational(string text, Dictionary<Char,Symbol> intervals)
-        {
-            Rational oldLeft = new Rational(0, (ulong)text.Length);
-            Rational oldRight = new Rational((ulong)text.Length, (ulong)text.Length);
-            Rational newLeft;
-            Rational newRight;
-            foreach (var symbol in text)
-            {
-                newRight = oldLeft + (oldRight - oldLeft) * intervals[symbol].Right;
-                newLeft = oldLeft + (oldRight - oldLeft) * intervals[symbol].Left;
-                oldRight = newRight;
-                oldLeft = newLeft;
-            }
-            return oldLeft;
+        //private static Rational GetRational(string text, Dictionary<Char,Symbol> intervals)
+        //{
+        //    Rational oldLeft = new Rational(0, (ulong)text.Length);
+        //    Rational oldRight = new Rational((ulong)text.Length, (ulong)text.Length);
+        //    Rational newLeft;
+        //    Rational newRight;
+        //    foreach (var symbol in text)
+        //    {
+        //        newRight = oldLeft + (oldRight - oldLeft) * intervals[symbol].Right;
+        //        newLeft = oldLeft + (oldRight - oldLeft) * intervals[symbol].Left;
+        //        oldRight = newRight;
+        //        oldLeft = newLeft;
+        //    }
+        //    return oldLeft;
 
-        }
-        private static string GetText(int count, Rational rational, Symbol[] symbols)
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < count; i++)
-            {
+        //}
+        //private static string GetText(int count, Rational rational, Symbol[] symbols)
+        //{
+        //    StringBuilder sb = new StringBuilder();
+        //    for (int i = 0; i < count; i++)
+        //    {
 
-                for(int j = 0; j < symbols.Length; j++)
-                {
-                    if(symbols[j].Left<= rational &&  rational<symbols[j].Right)
-                    {
-                        sb.Append(symbols[j].Value);
-                        rational = (rational - symbols[j].Left)/(symbols[j].Right - symbols[j].Left);
-                        break;
-                    }
-                }
-            }
-            return sb.ToString();
-        }
+        //        for(int j = 0; j < symbols.Length; j++)
+        //        {
+        //            if(symbols[j].Left<= rational &&  rational<symbols[j].Right)
+        //            {
+        //                sb.Append(symbols[j].Value);
+        //                rational = (rational - symbols[j].Left)/(symbols[j].Right - symbols[j].Left);
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    return sb.ToString();
+        //}
 
         private static Dictionary<Char, Symbol> GetIntervals(string text)
         {
@@ -254,12 +411,12 @@ namespace Algorithms
                     symbols[c].Frequency = symbols[c].Frequency + 1;
                 }
             }
-            ulong prevTop = 0;
+            decimal prevTop = 0.0000M;
             foreach (var value in symbols.Values)
             {
-                value.Left = new Rational(prevTop, (ulong)text.Length);
-                prevTop += value.Frequency;
-                value.Right = new Rational(prevTop, (ulong)text.Length);
+                value.Left = prevTop;
+                prevTop += Decimal.Divide(value.Frequency, text.Length);
+                value.Right = prevTop;
             }
             return symbols;
         }
@@ -270,12 +427,12 @@ namespace Algorithms
     {
         private Char value;
         public Char Value => value;
-        public Rational Left { get; set; }
-        public Rational Right { get; set; }
+        public decimal Left { get; set; }
+        public decimal Right { get; set; }
 
-        public ulong Frequency { get; set; }
+        public int Frequency { get; set; }
 
-        public Symbol(Char value, Rational left, Rational right, ulong frequency)
+        public Symbol(Char value, decimal left, decimal right, int frequency)
         {
             this.value = value;
             this.Left = left;
@@ -283,7 +440,7 @@ namespace Algorithms
             this.Frequency = frequency;
         }
 
-        public Symbol(Char value, ulong frequency)
+        public Symbol(Char value, int frequency)
         {
             this.value = value;
             this.Frequency = frequency;

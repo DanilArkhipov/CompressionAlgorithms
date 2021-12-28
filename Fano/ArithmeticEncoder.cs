@@ -12,9 +12,7 @@ namespace Algorithms
     {
         public async Task Decode(string inputPath, string outputPath)
         {
-            byte[] data = File.ReadAllBytes(inputPath);
-            var str = ArithmeticAlgorithm.Decode(data);
-            await Task.CompletedTask;
+            ArithmeticAlgorithm.Decode(inputPath, outputPath);
         }
 
         public async Task Encode(string inputPath, string outputPath)

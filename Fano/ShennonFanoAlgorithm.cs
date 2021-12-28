@@ -6,32 +6,46 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Algorithms.Comparers;
-
+using System.IO;
 
 namespace Algorithms
 {
-    public class FanoCompressor 
+    public static class ShennonFanoAlgorithm
     {
-        public FanoDataPreparer DataPreparer { get; set; }
+        public static void Decode(string input, string output)
+        {
+            byte symbolsCount;
+            List<SourceSymbolData> symbols = new List<SourceSymbolData>();
+            int bitsCount;
+            byte[] bytes;
 
-        public FanoCompressor()
-        {
-            DataPreparer = new FanoDataPreparer();
-        }
-        public string Decode(EncodedData data)
-        {
-            var res = new StringBuilder();
-            var codes = new Dictionary<BitArray, char>(data.MetaDada.Codes.Length, new BitArrayComparer());
-            foreach (var c in data.MetaDada.Codes)
+            using (var br = new BinaryReader(File.OpenRead(input)))
             {
-                codes.Add(c.Code, c.Symbol);
+                symbolsCount = br.ReadByte();
+                for(int i = 0; i < symbolsCount; i++)
+                {
+                    symbols.Add(new SourceSymbolData(br.ReadChar(), br.ReadInt32()));
+                }
+                bitsCount = br.ReadInt32();
+                var bytesCount = bitsCount % 8 == 0 ? bitsCount / 8 : (bitsCount / 8) + 1;
+                bytes = br.ReadBytes(bytesCount);
+            }
+
+            var encodeCodes = CreateCodes(symbols);
+            var bits = GetBits(bytes, bitsCount);
+            bits.Length = bitsCount;
+            var res = new StringBuilder();
+            var codes = new Dictionary<BitArray, char>(encodeCodes.Count, new BitArrayComparer());
+            foreach (var c in encodeCodes)
+            {
+                codes.Add(c.Value, c.Key);
             }
             var code = new BitArray(1);
             int localCodePos = 0;
             char value;
-            for (int i = 0; i < data.Data.Length; i++)
+            for (int i = 0; i < bits.Length; i++)
             {
-                code[localCodePos] = data.Data[i];
+                code[localCodePos] = bits[i];
                 if (codes.TryGetValue(code, out value))
                 {
                     res.Append(value);
@@ -44,12 +58,14 @@ namespace Algorithms
                     localCodePos += 1;
                 }
             }
-            return res.ToString();
+            
+            File.WriteAllText(output,res.ToString());
         }
 
-        public async Task<EncodedData> Encode(IEnumerable<string> text)
+        public static void Encode(string input, string output)
         {
-            var sourceSymbolsData = await DataPreparer.PrepareDataAsync(text);
+            var text = File.ReadAllText(input);
+            var sourceSymbolsData = GetSourceSymbolsData(text);
             var codes = CreateCodes(sourceSymbolsData);
 
             int bitsCount = 0;
@@ -61,27 +77,87 @@ namespace Algorithms
 
             int currPos = 0;
             BitArray bits;
-            foreach (var line in text)
+
+            for (int i = 0; i < text.Length; i++)
             {
-                for (int i = 0; i < line.Length; i++)
+                bits = codes[text[i]];
+                for (int j = 0; j < bits.Count; j++)
                 {
-                    bits = codes[line[i]];
-                    for (int j = 0; j < bits.Count; j++)
-                    {
-                        encodedText[currPos] = bits[j];
-                        currPos++;
-                    }
+                    encodedText[currPos] = bits[j];
+                    currPos++;
                 }
             }
-            var symbolCodes = codes.Select(x => new SymbolCode() { Symbol = x.Key, Code = x.Value }).ToArray();
-            var metaData = new FanoMetaData(symbolCodes);
-            return new EncodedData(metaData, encodedText);
+
+            using (var bw = new BinaryWriter(File.Open(output,FileMode.Create)))
+            {
+                bw.Write((byte)sourceSymbolsData.Length);
+                foreach (var data in sourceSymbolsData)
+                {
+                    bw.Write(data.SymbolInSourceAlphabet);
+                    bw.Write(data.Frequency);
+                }
+                var bytes = BitsToBytes(encodedText);
+                bw.Write(encodedText.Length);
+                bw.Write(bytes);
+            }
+        }
+
+        private static byte[] BitsToBytes(BitArray bits)
+        {
+            var bytes = new List<Byte>();
+            int currentByte = 0;
+            int currentMask = 128;
+            int j = 0;
+            for (int i = 0;i < bits.Count; i++)
+            {
+                if (bits[i] == true)
+                {
+                    currentByte |= currentMask;
+                }
+                j++;
+                currentMask >>= 1;
+                if (j == 8)
+                {
+                    j = 0;
+                    bytes.Add((byte)currentByte);
+                    currentMask = 128;
+                    currentByte = 0;
+                }
+            }
+            if (bits.Length % 8 != 0)
+            {
+                bytes.Add((byte)currentByte);
+            }
+            return bytes.ToArray();
+        }
+
+        private static BitArray GetBits(byte[] bytes, int countOfBits)
+        {
+            var sb = new StringBuilder();
+            var str = "";
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                str = Convert.ToString(bytes[i], toBase: 2);
+                if (str.Length < 8)
+                {
+                    str = new string('0', 8 - str.Length) + str;
+                }
+                sb.Append(str);
+            }
+            str = sb.ToString().Substring(0, countOfBits);
+            var bits = new BitArray(countOfBits);
+
+            for(int i = 0; i < bits.Length; i++)
+            {
+                bits[i] = str[i].ToString() == "1";
+            }
+            return bits;
         }
 
         /// <summary>
         /// Метод, который сопоставляет коды для символов алфавита
         /// </summary>
-        private Dictionary<char, BitArray> CreateCodes(ICollection<SourceSymbolData> preparedData)
+        private static Dictionary<char, BitArray> CreateCodes(ICollection<SourceSymbolData> preparedData)
         {
             var codes = new Dictionary<char, BitArray>();
             var sortedData = preparedData
@@ -94,7 +170,7 @@ namespace Algorithms
         /// <summary>
         /// Строит дерево кодов Фано и заполняет словарь, передаваемый первым параметром, полученными кодами
         /// </summary>
-        private void CreateFanoCodeTree(Dictionary<char, BitArray> codes, SourceSymbolData[] data, int startIndex, int endIndex, BitArray currentCode)
+        private static void CreateFanoCodeTree(Dictionary<char, BitArray> codes, SourceSymbolData[] data, int startIndex, int endIndex, BitArray currentCode)
         {
             var splitBorder = FindSplitBorder(data, startIndex, endIndex);
 
@@ -124,7 +200,7 @@ namespace Algorithms
         /// <summary>
         /// Метод безопасного добавления кода в словарь
         /// </summary>
-        private void AddCodeToDictionary(Dictionary<char, BitArray> dict, char key, BitArray value)
+        private static void AddCodeToDictionary(Dictionary<char, BitArray> dict, char key, BitArray value)
         {
             if (!dict.ContainsKey(key))
             {
@@ -135,7 +211,7 @@ namespace Algorithms
         /// <summary>
         /// Метод находит границу, которая делит упорядоченную по вероятностям коллекцию на две части с одинаковыми суммами вероятностей
         /// </summary>
-        private int FindSplitBorder(SourceSymbolData[] data, int startIndex, int endIndex)
+        private static int FindSplitBorder(SourceSymbolData[] data, int startIndex, int endIndex)
         {
             var leftQuantity = 0;
             var rightQuantity = 0;
@@ -168,9 +244,9 @@ namespace Algorithms
         }
 
         /// <summary>
-        /// Метод добавляющий в конец текущего кодв новое значение переданное в параметр
+        /// Метод добавляющий в конец текущего кода новое значение переданное в параметр
         /// </summary>
-        private BitArray AddCodeValue(BitArray currentCode, bool newValue)
+        private static BitArray AddCodeValue(BitArray currentCode, bool newValue)
         {
             var newCode = new BitArray(currentCode.Length + 1);
             for (int i = 0; i < currentCode.Length; i++)
@@ -179,6 +255,24 @@ namespace Algorithms
             }
             newCode[currentCode.Length] = newValue;
             return newCode;
+        }
+
+        private static SourceSymbolData[] GetSourceSymbolsData(string text)
+        {
+            var dict = new Dictionary<Char, SourceSymbolData>();
+
+            foreach (char c in text)
+            {
+                if (!dict.ContainsKey(c))
+                {
+                    dict.Add(c, new SourceSymbolData(c, 1));
+                }
+                else
+                {
+                    dict[c].Frequency += 1;
+                }
+            }
+            return dict.Values.ToArray();
         }
     }
 }

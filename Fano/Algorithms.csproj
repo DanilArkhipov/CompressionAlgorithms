@@ -50,14 +50,14 @@
     <Compile Include="Data\FanoMetaData.cs" />
     <Compile Include="Data\SourceSymbolData.cs" />
     <Compile Include="Data\SymbolCode.cs" />
-    <Compile Include="FanoCompressor.cs" />
-    <Compile Include="FanoDataPreparer.cs" />
+    <Compile Include="ShennonFanoAlgorithm.cs" />
     <Compile Include="HammingAlgorithm.cs" />
     <Compile Include="HammingCoder.cs" />
     <Compile Include="ICoder.cs" />
     <Compile Include="LZWAlgorithm.cs" />
     <Compile Include="LZWCoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShennonFanoCoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

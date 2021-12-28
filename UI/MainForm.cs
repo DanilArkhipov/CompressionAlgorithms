@@ -67,6 +67,11 @@ namespace UI
                     coder = new HammingCoder();
                 }
 
+                else if ((string)comboBoxSelectAlgorithm.SelectedItem == EnumHelper.GetRussianAlgorithmName(Data.Enums.Algorithm.ShennonFano.ToString()))
+                {
+                    coder = new ShennonFanoCoder();
+                }
+
                 if ((string)comboBoxSelectAction.SelectedItem == EnumHelper.GetRussianActionName(Data.Enums.Action.Encode.ToString()))
                 {
                     coder.Encode(labelFilePath.Text, saveFileDialog.FileName);
